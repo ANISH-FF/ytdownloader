@@ -4,9 +4,7 @@
     {
       "src": "api/info.py",
       "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
+      "config": { "maxLambdaSize": "50mb" }
     },
     {
       "src": "index.html",
@@ -16,5 +14,10 @@
   "routes": [
     { "src": "/api/info", "dest": "/api/info.py" },
     { "src": "/(.*)", "dest": "/index.html" }
-  ]
+  ],
+  "functions": {
+    "api/info.py": {
+      "maxDuration": 30
+    }
+  }
 }
