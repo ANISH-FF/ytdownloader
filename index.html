@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AnishDL — Premium Video Downloader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#0a0a08;min-height:100vh;color:#e8e4d8;overflow-x:hidden}
+.grain{position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+.gold-line{width:100%;height:1px;background:linear-gradient(90deg,transparent,#c9a84c,#f0d080,#c9a84c,transparent)}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 3rem;border-bottom:1px solid rgba(201,168,76,.15);position:relative;z-index:2}
+.logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;letter-spacing:.08em;color:#f0d080}
+.logo span{color:#e8e4d8;font-weight:300}
+nav ul{list-style:none;display:flex;gap:2.5rem}
+nav ul li a{color:#9a9580;text-decoration:none;font-size:13px;letter-spacing:.12em;text-transform:uppercase;transition:color .2s}
+nav ul li a:hover{color:#f0d080}
+.hero{position:relative;z-index:2;text-align:center;padding:5rem 2rem 3rem}
+.hero-badge{display:inline-block;border:1px solid rgba(201,168,76,.4);color:#c9a84c;font-size:11px;letter-spacing:.18em;text-transform:uppercase;padding:6px 18px;border-radius:2px;margin-bottom:2rem}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.8rem,6vw,5rem);font-weight:300;line-height:1.1;letter-spacing:-.01em;margin-bottom:1.2rem;color:#f5f0e8}
+.hero h1 em{font-style:italic;color:#f0d080}
+.hero>p{color:#6b6760;font-size:15px;max-width:420px;margin:0 auto 3rem;line-height:1.7;font-weight:300}
+.input-shell{max-width:680px;margin:0 auto;background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.25);border-radius:4px;display:flex;align-items:stretch;overflow:hidden;transition:border-color .3s}
+.input-shell:focus-within{border-color:rgba(201,168,76,.7);box-shadow:0 0 0 3px rgba(201,168,76,.06)}
+.input-icon{display:flex;align-items:center;padding:0 1rem;color:#c9a84c;font-size:18px;border-right:1px solid rgba(201,168,76,.15)}
+.url-input{flex:1;background:transparent;border:none;outline:none;padding:1rem 1.2rem;font-size:14px;color:#e8e4d8;font-family:'DM Sans',sans-serif;font-weight:300}
+.url-input::placeholder{color:#4a4844}
+.paste-btn{background:none;border:none;border-left:1px solid rgba(201,168,76,.15);color:#6b6760;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:0 1rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .2s}
+.paste-btn:hover{color:#c9a84c}
+.fetch-btn{background:#c9a84c;border:none;color:#0a0a08;font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:0 1.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;transition:background .2s,transform .1s}
+.fetch-btn:hover{background:#f0d080}
+.fetch-btn:active{transform:scale(.98)}
+.format-row{display:flex;justify-content:center;gap:.8rem;margin-top:1.5rem;flex-wrap:wrap}
+.fmt-chip{background:none;border:1px solid rgba(201,168,76,.2);color:#6b6760;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:5px 14px;border-radius:2px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.fmt-chip:hover,.fmt-chip.active{border-color:#c9a84c;color:#c9a84c;background:rgba(201,168,76,.06)}
+.error-msg{max-width:680px;margin:1rem auto 0;color:#e06060;font-size:13px;text-align:center;display:none}
+.error-msg.show{display:block}
+.loading-row{padding:2rem;text-align:center;color:#4a4844;font-size:13px;letter-spacing:.08em;display:none}
+.loading-row.show{display:block}
+.dot-anim::after{content:'';animation:dots 1.2s steps(4,end) infinite}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+.result-panel{max-width:680px;margin:2rem auto 0;background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.2);border-radius:4px;overflow:hidden;display:none}
+.result-panel.visible{display:block;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.video-info{display:flex;gap:1rem;padding:1.2rem;border-bottom:1px solid rgba(201,168,76,.1);align-items:center}
+.thumb-wrap{width:100px;height:60px;background:rgba(201,168,76,.08);border-radius:3px;flex-shrink:0;overflow:hidden}
+.thumb-wrap img{width:100%;height:100%;object-fit:cover}
+.thumb-icon{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#c9a84c;font-size:22px}
+.video-meta{flex:1;min-width:0}
+.video-title{font-size:14px;font-weight:500;color:#e8e4d8;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.video-sub{font-size:12px;color:#6b6760;letter-spacing:.04em}
+.section-label{padding:.7rem 1.2rem;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#4a4844;border-bottom:1px solid rgba(201,168,76,.08)}
+.quality-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0}
+.quality-item{padding:1rem 1.2rem;border-right:1px solid rgba(201,168,76,.1);border-bottom:1px solid rgba(201,168,76,.1);cursor:pointer;transition:background .2s;display:flex;flex-direction:column;gap:4px}
+.quality-item:hover{background:rgba(201,168,76,.05)}
+.q-label{font-size:18px;font-family:'Cormorant Garamond',serif;font-weight:600;color:#f0d080}
+.q-desc{font-size:11px;color:#6b6760;letter-spacing:.06em;text-transform:uppercase}
+.q-size{font-size:12px;color:#9a9580;margin-top:2px}
+.dl-btn{margin-top:6px;color:#c9a84c;font-size:13px;display:flex;align-items:center;gap:4px}
+.dl-btn.spin{color:#9a9580}
+.dl-btn.done{color:#5a9a5a}
+.note-bar{max-width:680px;margin:1rem auto 0;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.15);border-radius:4px;padding:.7rem 1rem;font-size:12px;color:#9a9580;text-align:center;display:none}
+.note-bar.show{display:block}
+.features{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;max-width:880px;margin:5rem auto 0;border-top:1px solid rgba(201,168,76,.12);border-bottom:1px solid rgba(201,168,76,.12)}
+.feat{padding:2.5rem 2rem;border-right:1px solid rgba(201,168,76,.12);text-align:center}
+.feat:last-child{border-right:none}
+.feat-icon{font-size:24px;color:#c9a84c;margin-bottom:1rem}
+.feat h3{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:#e8e4d8;margin-bottom:.5rem}
+.feat p{font-size:13px;color:#6b6760;line-height:1.6;font-weight:300}
+footer{position:relative;z-index:2;text-align:center;padding:3rem 2rem;color:#3a3834;font-size:12px;letter-spacing:.06em}
+footer a{color:#6b6760;text-decoration:none}
+@media(max-width:600px){nav{padding:1rem 1.5rem}nav ul{display:none}.hero{padding:3rem 1.5rem 2rem}.features{grid-template-columns:1fr}.feat{border-right:none;border-bottom:1px solid rgba(201,168,76,.12)}.feat:last-child{border-bottom:none}.quality-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="gold-line"></div>
+
+<nav>
+  <div class="logo">Anish<span>DL</span></div>
+  <ul>
+    <li><a href="#">Home</a></li>
+    <li><a href="#">Formats</a></li>
+    <li><a href="#">About</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge">Premium Video Downloader</div>
+  <h1>Download with<br><em>elegance</em></h1>
+  <p>Paste any YouTube link and retrieve your video in the format and quality of your choosing.</p>
+
+  <div class="input-shell">
+    <div class="input-icon"><i class="ti ti-link"></i></div>
+    <input class="url-input" id="urlInput" type="url" placeholder="https://www.youtube.com/watch?v=..." />
+    <button class="paste-btn" onclick="pasteUrl()">Paste</button>
+    <button class="fetch-btn" onclick="fetchVideo()">Fetch</button>
+  </div>
+
+  <div class="format-row">
+    <button class="fmt-chip active" onclick="setFmt(this,'mp4')">MP4 / Video</button>
+    <button class="fmt-chip" onclick="setFmt(this,'audio')">Audio Only</button>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+  <div class="loading-row" id="loadingRow"><span class="dot-anim">Fetching video details</span></div>
+  <div class="note-bar" id="noteBar">⚡ Direct stream links — your browser downloads straight from YouTube's servers. No middleman, no storage needed.</div>
+
+  <div class="result-panel" id="resultPanel">
+    <div class="video-info">
+      <div class="thumb-wrap" id="thumbWrap"><div class="thumb-icon"><i class="ti ti-player-play"></i></div></div>
+      <div class="video-meta">
+        <div class="video-title" id="vTitle">—</div>
+        <div class="video-sub" id="vSub">—</div>
+      </div>
+    </div>
+    <div class="section-label" id="sectionLabel">Select Quality</div>
+    <div class="quality-grid" id="qualityGrid"></div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="feat">
+    <div class="feat-icon"><i class="ti ti-bolt"></i></div>
+    <h3>Instant fetch</h3>
+    <p>Direct stream URLs — no server storage, downloads straight from YouTube at full speed.</p>
+  </div>
+  <div class="feat">
+    <div class="feat-icon"><i class="ti ti-shield-check"></i></div>
+    <h3>No account needed</h3>
+    <p>Zero sign-ups, zero tracking. Your downloads remain entirely your own.</p>
+  </div>
+  <div class="feat">
+    <div class="feat-icon"><i class="ti ti-adjustments"></i></div>
+    <h3>Every quality</h3>
+    <p>From pristine 4K down to 144p for video, plus audio-only extraction.</p>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 AnishDL &nbsp;·&nbsp; <a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a> &nbsp;·&nbsp; For personal use only</p>
+</footer>
+
+<script>
+let selectedFmt = 'mp4';
+let videoData = null;
+
+function setFmt(el, fmt) {
+  document.querySelectorAll('.fmt-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  selectedFmt = fmt;
+  if (videoData) renderQualities();
+}
+
+async function pasteUrl() {
+  try {
+    const text = await navigator.clipboard.readText();
+    document.getElementById('urlInput').value = text;
+  } catch { document.getElementById('urlInput').focus(); }
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 5000);
+}
+
+async function fetchVideo() {
+  const url = document.getElementById('urlInput').value.trim();
+  if (!url) { document.getElementById('urlInput').focus(); return; }
+
+  document.getElementById('resultPanel').classList.remove('visible');
+  document.getElementById('noteBar').classList.remove('show');
+  document.getElementById('loadingRow').classList.add('show');
+  document.getElementById('errorMsg').classList.remove('show');
+
+  try {
+    const res = await fetch('/api/info', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url })
+    });
+    const data = await res.json();
+    document.getElementById('loadingRow').classList.remove('show');
+
+    if (data.error) { showError(data.error); return; }
+    videoData = data;
+
+    document.getElementById('vTitle').textContent = data.title;
+    document.getElementById('vSub').textContent = `${data.duration} · ${data.channel}`;
+
+    const tw = document.getElementById('thumbWrap');
+    tw.innerHTML = data.thumbnail
+      ? `<img src="${data.thumbnail}" alt="thumb" />`
+      : `<div class="thumb-icon"><i class="ti ti-player-play"></i></div>`;
+
+    renderQualities();
+    document.getElementById('resultPanel').classList.add('visible');
+    document.getElementById('noteBar').classList.add('show');
+  } catch (e) {
+    document.getElementById('loadingRow').classList.remove('show');
+    showError('Could not fetch video info. Try again.');
+  }
+}
+
+function fmtSize(bytes) {
+  if (!bytes) return '';
+  const mb = bytes / 1048576;
+  return mb > 1000 ? `~${(mb/1024).toFixed(1)} GB` : `~${Math.round(mb)} MB`;
+}
+
+function renderQualities() {
+  const grid = document.getElementById('qualityGrid');
+  const label = document.getElementById('sectionLabel');
+
+  if (selectedFmt === 'audio') {
+    label.textContent = 'Audio Only';
+    const au = videoData.audio;
+    if (!au) { grid.innerHTML = '<div style="padding:1.5rem;color:#6b6760;font-size:13px">No audio stream found</div>'; return; }
+    grid.innerHTML = `
+      <div class="quality-item" onclick="doDownload(this,'${au.url}','audio.${au.ext}')">
+        <div class="q-label">Audio</div>
+        <div class="q-desc">Best quality</div>
+        <div class="q-size">${au.ext.toUpperCase()}</div>
+        <div class="dl-btn"><i class="ti ti-download"></i> Download</div>
+      </div>`;
+  } else {
+    label.textContent = 'Select Quality — Video';
+    const qs = videoData.qualities || [];
+    if (!qs.length) { grid.innerHTML = '<div style="padding:1.5rem;color:#6b6760;font-size:13px">No video streams found</div>'; return; }
+    grid.innerHTML = qs.map(q => `
+      <div class="quality-item" onclick="doDownload(this,'${q.url.replace(/'/g,"\\'")}','video_${q.label}.${q.ext}')">
+        <div class="q-label">${q.label}</div>
+        <div class="q-desc">${q.height}p · ${q.ext.toUpperCase()}</div>
+        <div class="q-size">${fmtSize(q.filesize)}</div>
+        <div class="dl-btn"><i class="ti ti-download"></i> Download</div>
+      </div>`).join('');
+  }
+}
+
+function doDownload(el, url, filename) {
+  const btn = el.querySelector('.dl-btn');
+  btn.innerHTML = '<i class="ti ti-check"></i> Starting…';
+  btn.classList.add('done');
+
+  // Open direct stream URL in new tab (browser handles download)
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(() => {
+    btn.innerHTML = '<i class="ti ti-download"></i> Download';
+    btn.classList.remove('done');
+  }, 3000);
+}
+
+document.getElementById('urlInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') fetchVideo();
+});
+</script>
+</body>
+</html>
